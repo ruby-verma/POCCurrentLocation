@@ -1,24 +1,20 @@
 package com.ruby.poccurrentlocation;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -27,10 +23,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 
-import java.io.Console;
-
 import static com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY;
-import static com.google.android.gms.location.LocationRequest.PRIORITY_LOW_POWER;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -70,9 +63,7 @@ public class MainActivity extends AppCompatActivity {
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         tvLocation = (TextView) findViewById(R.id.tvLocation);
         btnGetLocation = (Button) findViewById(R.id.button);
-        btnGetLocation.setOnClickListener( v -> {
-            getLocation();
-        });
+        btnGetLocation.setOnClickListener( v -> getLocation());
     }
 
     private void getLocation() {
@@ -90,16 +81,13 @@ public class MainActivity extends AppCompatActivity {
             // continue using your app without granting the permission.
             Log.i(getClass().getName(), "Displaying permission rationale to provide additional context.");
 
-            showSnackbar(R.string.permission_rationale, android.R.string.ok,
-                    new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            // Request permission
-                            locationPermissionRequest.launch(new String[] {
-                                    Manifest.permission.ACCESS_FINE_LOCATION,
-                                    Manifest.permission.ACCESS_COARSE_LOCATION
-                            });
-                        }
+            showSnackbar(
+                    view -> {
+                        // Request permission
+                        locationPermissionRequest.launch(new String[] {
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.ACCESS_COARSE_LOCATION
+                        });
                     });
         } else {
             // You can directly ask for the permission.
@@ -118,19 +106,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void showSnackbar(final int mainTextStringId, final int actionStringId,
-                              View.OnClickListener listener) {
+    private void showSnackbar(View.OnClickListener listener) {
         Snackbar.make(findViewById(android.R.id.content),
-                getString(mainTextStringId),
+                getString(R.string.permission_rationale),
                 Snackbar.LENGTH_INDEFINITE)
-                .setAction(getString(actionStringId), listener).show();
-    }
-
-    private boolean checkPermissions() {
-
-        int permissionState = ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_COARSE_LOCATION);
-        return permissionState == PackageManager.PERMISSION_GRANTED;
+                .setAction(getString(android.R.string.ok), listener).show();
     }
 
     /*@Override
@@ -184,15 +164,8 @@ public class MainActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, new OnCompleteListener<Location>() {
                     @Override
                     public void onComplete(@NonNull Task<Location> task) {
-                        Log.d(getClass().getName(), "Task is not null");
-                        boolean success = task.isSuccessful();
-                        Log.d(getClass().getName(), "success: " + success);
-                        boolean completed = task.isComplete();
-                        Log.d(getClass().getName(), "completed: " + completed);
-                        boolean canceled = task.isCanceled();
-                        Log.d(getClass().getName(), "canceled: " + canceled);
                         mLocation = task.getResult();
-                        if(mLocation != null) {
+                        if(task.isSuccessful() && mLocation != null) {
                             Log.d(getClass().getName(), "result: " + mLocation.toString());
                             @SuppressLint("DefaultLocale") String result = String.format("Location (success): %f: %f", mLocation.getLatitude(), mLocation.getLongitude()) ;
                             tvLocation.setText(result);
