@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
                                 getLastLocation();
                             } else {
                                 Log.d(getClass().getName(), "No location access granted.");
+                                showSnackbar("No location access granted.");
                             }
                         }
                 );
